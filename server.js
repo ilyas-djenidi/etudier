@@ -47,6 +47,7 @@ app.post('/login', checkIPBlock, (req, res) => {
     const { username, password } = req.body;
     const clientIP = req.ip;
 
+    
     // Check if username exists
     const userAccount = validAccounts.find(account => account.username === username);
 
