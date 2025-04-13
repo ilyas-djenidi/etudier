@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Etudier - Profile</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        nav {
+            background: #1a73e8;
+            color: white;
+            padding: 1rem;
+        }
+        .profile-container {
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 2rem;
+        }
+        .profile-image {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: #ddd;
+            margin: 0 auto;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            text-align: center;
+            margin: 2rem 0;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <h1>Student Profile</h1>
+        <a href="index.html" style="color: white;">Dashboard</a>
+    </nav>
+    <div class="profile-container">
+        <div class="profile-image"></div>
+        <h2>John Doe</h2>
+        <p>Student ID: STU123456</p>
+        <div class="stats">
+            <div>
+                <h3>Courses</h3>
+                <p>12</p>
+            </div>
+            <div>
+                <h3>Completed</h3>
+                <p>8</p>
+            </div>
+            <div>
+                <h3>Awards</h3>
+                <p>5</p>
+            </div>
+        </div>
+        <h3>About Me</h3>
+        <p>Computer Science student passionate about learning new technologies and solving complex problems.</p>
+    </div>
+</body>
+</html>
