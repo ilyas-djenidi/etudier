@@ -1,9 +1,20 @@
 const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
+const rateLimit = require('express-rate-limit');
 
 const app = express();
 const port = 3000;
+
+// Rate limiter to block too many requests from same IP
+const limiter = rateLimit({
+    windowMs: 60 * 1000, // 1 minute
+    max: 10, // max 10 requests per minute
+    handler: (req, res) => {
+        res.redirect('/login?error=Too many requests from this IP, please try again later.');
+    }
+});
+app.use(limiter);
 
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -47,36 +58,27 @@ app.post('/login', checkIPBlock, (req, res) => {
     const { username, password } = req.body;
     const clientIP = req.ip;
 
-    
     // Check if username exists
     const userAccount = validAccounts.find(account => account.username === username);
 
     if (!userAccount) {
-        // Track failed attempts
         const attempts = (failedAttempts.get(clientIP) || 0) + 1;
         failedAttempts.set(clientIP, attempts);
-
-        // Check if attempts exceed limit
         if (attempts > 3) {
             blockedIPs.set(clientIP, Date.now() + 30000); // Block for 30 seconds
             return res.redirect('/login?error=Your IP is blocked for 30 seconds due to multiple failed attempts');
         }
-
         return res.redirect('/login?error=Invalid username');
     }
 
     // Check password
     if (userAccount.password !== password) {
-        // Track failed attempts
         const attempts = (failedAttempts.get(clientIP) || 0) + 1;
         failedAttempts.set(clientIP, attempts);
-
-        // Check if attempts exceed limit
         if (attempts > 3) {
             blockedIPs.set(clientIP, Date.now() + 30000); // Block for 30 seconds
             return res.redirect('/login?error=Your IP is blocked for 30 seconds due to multiple failed attempts');
         }
-
         return res.redirect('/login?error=Incorrect password');
     }
 
@@ -85,22 +87,15 @@ app.post('/login', checkIPBlock, (req, res) => {
     res.send('Login successful!');
 });
 
-const startServer = (initialPort) => {
-    const server = app.listen(initialPort)
-        .on('error', (err) => {
-            if (err.code === 'EADDRINUSE') {
-                console.log(`Port ${initialPort} is busy, trying ${initialPort + 1}...`);
-                server.close();
-                startServer(initialPort + 1);
-            } else {
-                console.error('Server error:', err);
-            }
-        })
-        .on('listening', () => {
-            const actualPort = server.address().port;
-            console.log(`Server running at http://localhost:${actualPort}`);
-        });
-};
+// Run the server normally, no port change
+const server = app.listen(port, () => {
+    console.log(`Server running at http://localhost:${port}`);
+});
 
-// Replace the existing app.listen with this call
-startServer(port);
+server.on('error', (err) => {
+    if (err.code === 'EADDRINUSE') {
+        console.error(`Port ${port} is already in use.`);
+    } else {
+        console.error('Server error:', err);
+    }
+});
